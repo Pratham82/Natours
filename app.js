@@ -31,6 +31,27 @@ app.get('/api/v1/tours', (_, res) => {
   })
 })
 
+// @GET Individual Tour
+app.get('/api/v1/tours/:id', (req, res) => {
+  // In req.params all the parameters are stored
+  // We can use multiple parameters
+  // To make a parameter optional we will have to add '?' after it:
+  // app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
+  const id = Number(req.params.id)
+  const tour = tours.find(tour => tour.id === id)
+
+  if (!tour) {
+    return res
+      .status(404)
+      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
+  }
+
+  res.status(200).send({
+    status: 'success',
+    tours: tour,
+  })
+})
+
 // @POST tours
 app.post('/api/v1/tours', (req, res) => {
   const newID = tours[tours.length - 1].id + 1

@@ -20,8 +20,9 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 )
 
-// @GET Tours
-app.get('/api/v1/tours', (_, res) => {
+// Handler functions
+
+const getAllTours = (_, res) => {
   res.status(200).send({
     status: 'success',
     results: tours.length,
@@ -29,10 +30,9 @@ app.get('/api/v1/tours', (_, res) => {
       tours,
     },
   })
-})
+}
 
-// @GET Individual Tour
-app.get('/api/v1/tours/:id', (req, res) => {
+const getTour = (req, res) => {
   // In req.params all the parameters are stored
   // We can use multiple parameters
   // To make a parameter optional we will have to add '?' after it:
@@ -50,10 +50,9 @@ app.get('/api/v1/tours/:id', (req, res) => {
     status: 'success',
     tours: tour,
   })
-})
+}
 
-// @POST tours
-app.post('/api/v1/tours', (req, res) => {
+const createTour = (req, res) => {
   const newID = tours[tours.length - 1].id + 1
   const newTour = Object.assign({ id: newID }, req.body)
   console.log(newTour)
@@ -76,8 +75,61 @@ app.post('/api/v1/tours', (req, res) => {
       })
     }
   )
-})
+}
 
-app.post('/', (_, res) => res.send('You can POST to this endpoint'))
+const updateTour = (req, res) => {
+  const id = Number(req.params.id)
+
+  if (id > tours.length) {
+    return res
+      .status(404)
+      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here.....>',
+    },
+  })
+}
+
+const deleteTour = (req, res) => {
+  const id = Number(req.params.id)
+
+  if (id > tours.length) {
+    return res
+      .status(404)
+      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
+  }
+
+  res.status(204).json({
+    status: 'success',
+    data: null,
+  })
+}
+
+// Routes
+/*
+// @GET Tours
+app.get('/api/v1/tours', getAllTours)
+
+// @GET Individual Tour
+app.get('/api/v1/tours/:id', getTour)
+
+// @POST tours
+app.post('/api/v1/tours', createTour)
+
+// @PATCH update tours
+app.patch('/api/v1/tours/:id', updateTour)
+
+// @DELETE delete tours
+app.delete('/api/v1/tours/:id', deleteTour)
+  */
+
+// Refactoring routes
+app.route('/api/v1/tours').get(getAllTours).get(createTour).post(createTour)
+
+app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour)
 
 app.listen(PORT, () => console.log(`Server started on PORT ${PORT}`))

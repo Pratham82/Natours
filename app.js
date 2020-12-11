@@ -4,17 +4,20 @@ const fs = require('fs')
 const app = express()
 
 const PORT = 4000
+
 // Using middleware(This will parse the req object)
 app.use(express.json())
 
-// Simple Get request
-//app.get('/', (_, res) => {
-//  //res.status(200).send('Hello from express')
-//  res.json({
-//    name: 'Prathamesh Mali',
-//    message: 'Clean your code!!',
-//  })
-//})
+// Creating our own middleware function (next is passed as 3rd arg and its a convention to use name next)
+app.use((req, res, next) => {
+  console.log('Hello from middleware')
+  next()
+})
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toDateString()
+  next()
+})
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -22,9 +25,10 @@ const tours = JSON.parse(
 
 // Handler functions
 
-const getAllTours = (_, res) => {
+const getAllTours = (req, res) => {
   res.status(200).send({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours,
@@ -38,7 +42,7 @@ const getTour = (req, res) => {
   // To make a parameter optional we will have to add '?' after it:
   // app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
   const id = Number(req.params.id)
-  const tour = tours.find(tour => tour.id === id)
+  const tour = tours.find((tour) => tour.id === id)
 
   if (!tour) {
     return res
@@ -64,7 +68,7 @@ const createTour = (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    err => {
+    (err) => {
       // if (err) return 'Unable to write to file'
       res.status(201).json({
         status: 'success',

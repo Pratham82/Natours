@@ -1,9 +1,14 @@
 const express = require('express')
 const fs = require('fs')
+const morgan = require('morgan')
 
 const app = express()
 
 const PORT = 4000
+
+// Middlewares
+
+app.use(morgan('dev'))
 
 // Using middleware(This will parse the req object)
 app.use(express.json())
@@ -21,6 +26,10 @@ app.use((req, res, next) => {
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
+)
+
+const users = JSON.parse(
+  fs.readFileSync(`${__dirname}/dev-data/data/users.json`)
 )
 
 // Handler functions
@@ -42,7 +51,7 @@ const getTour = (req, res) => {
   // To make a parameter optional we will have to add '?' after it:
   // app.get('/api/v1/tours/:id/:x/:y?', (req, res) => {
   const id = Number(req.params.id)
-  const tour = tours.find((tour) => tour.id === id)
+  const tour = tours.find(tour => tour.id === id)
 
   if (!tour) {
     return res
@@ -68,7 +77,7 @@ const createTour = (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (err) => {
+    err => {
       // if (err) return 'Unable to write to file'
       res.status(201).json({
         status: 'success',
@@ -113,6 +122,45 @@ const deleteTour = (req, res) => {
   })
 }
 
+// User Route Handlers
+const getAllUsers = (_, res) => {
+  res.status(200).send({
+    status: 'success',
+    results: users.length,
+    data: {
+      users,
+    },
+  })
+}
+
+const createUser = (req, res) => {
+  res.status(500).send({
+    status: 'fail',
+    msg: 'Yet to be implemented',
+  })
+}
+
+const getUser = (req, res) => {
+  res.status(500).send({
+    status: 'fail',
+    msg: 'Yet to be implemented',
+  })
+}
+
+const updatUser = (req, res) => {
+  res.status(500).send({
+    status: 'fail',
+    msg: 'Yet to be implemented',
+  })
+}
+
+const deleteUser = (req, res) => {
+  res.status(500).send({
+    status: 'fail',
+    msg: 'Yet to be implemented',
+  })
+}
+
 // Routes
 /*
 // @GET Tours
@@ -132,8 +180,21 @@ app.delete('/api/v1/tours/:id', deleteTour)
   */
 
 // Refactoring routes
-app.route('/api/v1/tours').get(getAllTours).get(createTour).post(createTour)
+// Creating Routers
+const tourRouter = express.Router()
+const userRouter = express.Router()
 
-app.route('/api/v1/tours/:id').get(getTour).patch(updateTour).delete(deleteTour)
+// Tour routes
+tourRouter.route('/').get(getAllTours).post(createTour)
+tourRouter.route('/:id').get(getTour).patch(updateTour).delete(deleteTour)
+
+// User routes
+userRouter.route('/').get(getAllUsers).post(createUser)
+userRouter.route('/:id').get(getUser).patch(updatUser).delete(deleteUser)
+
+// Connecting the router with our application
+// Mounting routers on route
+app.use('/api/v1/tours', tourRouter)
+app.use('/api/v1/users', userRouter)
 
 app.listen(PORT, () => console.log(`Server started on PORT ${PORT}`))

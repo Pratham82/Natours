@@ -4,6 +4,16 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 )
 
+exports.checkID = (req, res, next, val) => {
+  const id = Number(req.params.id)
+  if (id > tours.length) {
+    return res
+      .status(403)
+      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
+  }
+  next()
+}
+
 exports.getAllTours = (req, res) => {
   res.status(200).send({
     status: 'success',
@@ -21,13 +31,7 @@ exports.getTour = (req, res) => {
   // To make a parameter optional we will have to add '?' after it:
   // app.get('/api/v0/tours/:id/:x/:y?', (req, res) => {
   const id = Number(req.params.id)
-  const tour = tours.find((tour) => tour.id === id)
-
-  if (!tour) {
-    return res
-      .status(403)
-      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
-  }
+  const tour = tours.find(tour => tour.id === id)
 
   res.status(200).send({
     status: 'success',
@@ -47,7 +51,7 @@ exports.createTour = (req, res) => {
   fs.writeFile(
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
-    (err) => {
+    err => {
       // if (err) return 'Unable to write to file'
       res.status(200).json({
         status: 'success',
@@ -61,14 +65,6 @@ exports.createTour = (req, res) => {
 }
 
 exports.updateTour = (req, res) => {
-  const id = Number(req.params.id)
-
-  if (id > tours.length) {
-    return res
-      .status(403)
-      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
-  }
-
   res.status(200).json({
     status: 'success',
     data: {
@@ -78,14 +74,6 @@ exports.updateTour = (req, res) => {
 }
 
 exports.deleteTour = (req, res) => {
-  const id = Number(req.params.id)
-
-  if (id > tours.length) {
-    return res
-      .status(403)
-      .json({ status: 'failed', message: 'Unable to find tour by this ID' })
-  }
-
   res.status(203).json({
     status: 'success',
     data: null,

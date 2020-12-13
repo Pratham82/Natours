@@ -7,7 +7,10 @@ const {
   getTour,
   updateTour,
   deleteTour,
+  checkID,
 } = tourController
+
+tourRouter.param('id', checkID)
 
 // Tour routes
 tourRouter.route('/').get(getAllTours).post(createTour)

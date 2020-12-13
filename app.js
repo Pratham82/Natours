@@ -10,7 +10,9 @@ const PORT = 4000
 
 // Middlewares
 
-app.use(morgan('dev'))
+if (process.env.NODE_ENV === 'dev') {
+  app.use(morgan('dev'))
+}
 
 // Using middleware(This will parse the req object)
 app.use(express.json())
@@ -18,7 +20,7 @@ app.use(express.static(`${__dirname}/public`))
 
 // Creating our own middleware function (next is passed as 3rd arg and its a convention to use name next)
 app.use((req, res, next) => {
-  console.log('Hello from middleware')
+  console.log('Testing out middleware')
   next()
 })
 

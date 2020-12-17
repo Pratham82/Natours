@@ -19,10 +19,10 @@ app.use(express.json())
 app.use(express.static(`${__dirname}/public`))
 
 // Creating our own middleware function (next is passed as 3rd arg and its a convention to use name next)
-app.use((req, res, next) => {
+/*app.use((req, res, next) => {
   console.log('Testing out middleware')
   next()
-})
+})*/
 
 app.use((req, res, next) => {
   req.requestTime = new Date().toDateString()

@@ -3,7 +3,33 @@ const Tour = require('../models/tourModel')
 
 exports.getAllTours = async (req, res) => {
   try {
-    const allTours = await Tour.find({})
+    // Build query
+    // Filtering
+    const queryObj = { ...req.query }
+    const excludedFields = ['page', 'sort', 'limit', 'fileds']
+    // Filtering out unwanted query parameters
+    excludedFields.map(el => delete queryObj[el])
+
+    console.log(req.query, queryObj)
+
+    // Advanced filtering
+    let queryString = JSON.stringify(queryObj)
+
+    //Replacing the query string with the mongo query
+    queryString = JSON.parse(
+      queryString.replace(/(gt|gte|lt|lte)\b/g, match => `$${match}`)
+    )
+
+    const query = await Tour.find(queryString)
+
+    // Execute query
+    const allTours = await query
+
+    /* const query = await Tour.find()
+      .where('duration')
+      .equals(5)
+      .where('difficulty')
+      .equals('easy')*/
 
     res.status(200).send({
       status: 'success',

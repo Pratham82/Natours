@@ -12,6 +12,7 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: false,
+    useUnifiedTopology: true,
   })
   .then(res => console.log('Remote Mongo DB connected ✅'))
 

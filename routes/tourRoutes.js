@@ -7,9 +7,10 @@ const {
   getTour,
   updateTour,
   deleteTour,
+  aliasTopTours,
 } = tourController
 
-//tourRouter.param('id', checkID)
+tourRouter.route('/top-5-cheap').get(aliasTopTours, getAllTours)
 
 // Tour routes
 tourRouter.route('/').get(getAllTours).post(createTour)

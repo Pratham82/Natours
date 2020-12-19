@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
+const validator = require('validator')
 require('dotenv').config()
 
 // Creating a schema for our database
@@ -10,6 +11,10 @@ const tourSchema = new mongoose.Schema(
       // this is the validator
       required: [true, 'Tour must have a name'],
       unique: true,
+      trim: true,
+      maxlength: [40, 'A tour name must have less than eqaul to 40 characters'],
+      minlength: [10, 'A tour name must have more than eqaul to 10 characters'],
+      validate: [validator.isAlpha, 'Tour name must only contain alphabets'],
     },
     slug: String,
     duration: {
@@ -23,10 +28,16 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'Tour must have a difficulty'],
+      enum: {
+        values: ['easy', 'medium', 'difficult'],
+        message: 'Diffucult should be either: easy, medium, or difficult',
+      },
     },
     ratingsAverage: {
       type: Number,
       default: 4.5,
+      min: [1, 'The rating must above 1.0'],
+      max: [5, 'The rating must be below 5.0'],
     },
     ratingsQauntity: {
       type: Number,
@@ -36,7 +47,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Tour must have a price'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        // Works only when we are creating a new doc
+        validator: function (val) {
+          return val < this.price
+        },
+        message: 'Discount price ({VALUE}) should be below regular price',
+      },
+    },
     summary: {
       type: String,
       trim: true,
@@ -131,7 +151,6 @@ const Tour = mongoose.model('Tour', tourSchema)
 module.exports = Tour
 
 /*
-
 Sample document creation
 
 // Creating a document with help of the model

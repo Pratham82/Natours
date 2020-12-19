@@ -113,6 +113,18 @@ tourSchema.post(/^find/, function (docs, next) {
   next()
 })
 
+// Aggregation middleware
+// Hiding the secret tour from our aggregation results
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({
+    $match: {
+      secretTour: { $ne: true },
+    },
+  })
+  console.log(this.pipeline())
+  next()
+})
+
 // Creating a model
 const Tour = mongoose.model('Tour', tourSchema)
 

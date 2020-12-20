@@ -3,6 +3,8 @@ const fs = require('fs')
 const morgan = require('morgan')
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
+const AppError = require('./utils/appError')
+const globalErrorHandler = require('./controllers/errorController')
 
 const app = express()
 
@@ -55,5 +57,13 @@ app.delete('/api/v1/tours/:id', deleteTour)
 // Mounting routers on route
 app.use('/api/v1/tours', tourRouter)
 app.use('/api/v1/users', userRouter)
+
+// 404 Route
+app.all('*', (req, res, next) => {
+  next(new AppError(`Cannot find the endpoint '${req.originalUrl}'`, 404))
+})
+
+// Error handling middleware
+app.use(globalErrorHandler)
 
 module.exports = app

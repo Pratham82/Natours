@@ -1,5 +1,13 @@
 const app = require('./app')
 const mongoose = require('mongoose')
+
+// Handling uncaught exception
+process.on('uncaughtException', err => {
+  console.log('Uncaught Exception')
+  console.log(err.name, err.message)
+  process.exit(1)
+})
+
 require('dotenv').config()
 
 console.log(app.get('env'))
@@ -17,4 +25,14 @@ mongoose
   .then(res => console.log('Remote Mongo DB connected ✅'))
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log(`Server started on PORT ${PORT}`))
+const server = app.listen(PORT, () =>
+  console.log(`Server started on PORT ${PORT}`)
+)
+
+process.on('unhandledRejection', err => {
+  console.log('Unhandled Rejection')
+  console.log(err.name, err.message)
+  server.close(() => {
+    process.exit(1)
+  })
+})

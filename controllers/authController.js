@@ -18,6 +18,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     confirmedPassword: req.body.confirmedPassword,
+    passwordChangedAt: req.body.passwordChangedAt,
   })
 
   const token = signToken(newUser._id)
@@ -70,7 +71,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(' ')[1]
   }
-  console.log(`Token: ${token}`)
+  //  console.log(`Token: ${token}`)
 
   if (!token) {
     return next(
@@ -78,11 +79,28 @@ exports.protect = catchAsync(async (req, res, next) => {
     )
   }
 
-  //2. Verification of token
+  // 2. Verification of token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
 
-  console.log(decoded)
+  // 3. Check if the user still existes
+  const currentUser = await User.findById({ _id: decoded.id })
 
-  console.log('Protect Route implemented')
+  if (!currentUser) {
+    return next(
+      new AppError('The user belonging tp this user no longer exists', 401)
+    )
+  }
+
+  // 4. Check if user recently changed the password after the token was issued
+  //  console.log(user)
+  //console.log(decoded.iat)
+  if (currentUser.checkPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently chnaged password! Please login again', 401)
+    )
+  }
+
+  // Grant access to protected route
+  req.user = currentUser
   next()
 })

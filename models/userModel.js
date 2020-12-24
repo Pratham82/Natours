@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
       message: 'Password and Confirmed password should match!',
     },
   },
+  passwordChangedAt: Date,
 })
 
 // Encryption using the preSave mongo middleware
@@ -49,13 +50,27 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-// Checking the password sent by users by the login rout, Instance method: Its a method that is going to be available  on all documents of a certain collection
+// Checking the password sent by users by the login route, Instance method: Its a method that is going to be available  on all documents of a certain collection
 // Here the candidate password is the password candidate passes in the body and the userPassword is the existing password in the DB
 userSchema.methods.checkCorrectPassword = async function (
   candidatePassword,
   userPassword
 ) {
   return await bcrypt.compare(candidatePassword, userPassword)
+}
+
+userSchema.methods.checkPasswordAfter = function (JWTTimestamp) {
+  console.log('checkPasswordAfter called')
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    )
+    return JWTTimestamp < changedTimeStamp
+  }
+
+  // If password not chnaged return false
+  return false
 }
 
 const User = mongoose.model('User', userSchema)

@@ -3,6 +3,7 @@ const User = require('./../models/userModel')
 const jwt = require('jsonwebtoken')
 const AppError = require('../utils/appError')
 const bcrypt = require('bcrypt')
+const { promisify } = require('util')
 require('dotenv').config()
 
 const signToken = id => {
@@ -58,4 +59,30 @@ exports.login = catchAsync(async (req, res, next) => {
     status: 'Successful',
     token,
   })
+})
+
+exports.protect = catchAsync(async (req, res, next) => {
+  // 1. Get the token and check if its present
+  let token
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith('Bearer')
+  ) {
+    token = req.headers.authorization.split(' ')[1]
+  }
+  console.log(`Token: ${token}`)
+
+  if (!token) {
+    return next(
+      new AppError('You are not logged in, Please log in to get Access', 401)
+    )
+  }
+
+  //2. Verification of token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET)
+
+  console.log(decoded)
+
+  console.log('Protect Route implemented')
+  next()
 })

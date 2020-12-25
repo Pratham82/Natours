@@ -1,5 +1,10 @@
 const express = require('express')
-const { signUp, login } = require('../controllers/authController')
+const {
+  signUp,
+  login,
+  forgotPassword,
+  resetPassword,
+} = require('../controllers/authController')
 const userRouter = express.Router()
 const useController = require('./../controllers/userController')
 const {
@@ -17,5 +22,9 @@ userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)
 // Auth routes
 userRouter.post('/signup', signUp)
 userRouter.post('/login', login)
+
+// Password routes
+userRouter.post('/forgotPassword', forgotPassword)
+userRouter.patch('/resetPassword/:token', resetPassword)
 
 module.exports = userRouter

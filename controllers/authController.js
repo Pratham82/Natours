@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt')
 const { promisify } = require('util')
 require('dotenv').config()
 
-const signToken = id => {
+const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   })
@@ -19,6 +19,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
     password: req.body.password,
     confirmedPassword: req.body.confirmedPassword,
     passwordChangedAt: req.body.passwordChangedAt,
+    role: req.body.role,
   })
 
   const token = signToken(newUser._id)
@@ -104,3 +105,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser
   next()
 })
+
+// Authorization
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // Roles: admin, lead-guide havs the access to delete users
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You Do not have permission to perform this action', 403)
+      )
+    }
+    next()
+  }
+}

@@ -58,6 +58,16 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
+// Add passwordChangedAt propety to the user
+userSchema.pre('save', function (next) {
+  // If the user is newly created or not mdified then don't do anything
+  if (!this.isModified('password') || this.isNew) return next()
+
+  // If user is modified add the property
+  this.passwordChangedAt = Date.now() - 1000
+  next()
+})
+
 // Checking the password sent by users by the login route, Instance method: Its a method that is going to be available  on all documents of a certain collection
 // Here the candidate password is the password candidate passes in the body and the userPassword is the existing password in the DB
 userSchema.methods.checkCorrectPassword = async function (
@@ -92,7 +102,7 @@ userSchema.methods.createPasswordResetToken = function () {
 
   console.log({ resetToken }, this.passwordResetToken)
 
-  this.passwordResetExpires = Date.now() + 10 * 60 * 100
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000
 
   return resetToken
 }

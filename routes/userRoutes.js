@@ -16,10 +16,13 @@ const {
   updateUser,
   deleteUser,
   updateMe,
+  deleteMe,
 } = useController
 
 userRouter.patch('/updateUserPassword', protect, updatePassword)
 userRouter.patch('/updateMe', protect, updateMe)
+userRouter.delete('/deleteMe', protect, deleteMe)
+
 // User routes
 userRouter.route('/').get(getAllUsers).post(createUser)
 userRouter.route('/:id').get(getUser).patch(updateUser).delete(deleteUser)

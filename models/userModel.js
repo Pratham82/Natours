@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 })
 
 // Encryption using the preSave mongo middleware
@@ -65,6 +70,13 @@ userSchema.pre('save', function (next) {
 
   // If user is modified add the property
   this.passwordChangedAt = Date.now() - 1000
+  next()
+})
+
+// Dont send inactive users
+userSchema.pre(/^find/, function (next) {
+  //This refers to the current query
+  this.find({ active: { $ne: false } })
   next()
 })
 

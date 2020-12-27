@@ -1,6 +1,8 @@
 const express = require('express')
 const fs = require('fs')
 const morgan = require('morgan')
+const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
 const AppError = require('./utils/appError')
@@ -10,14 +12,30 @@ const app = express()
 
 const PORT = 4000
 
-// Middlewares
+//####  Global Middlewares
 
+// Adding helmet middleware for setting security HTTP headers
+app.use(helmet())
+
+// Development Logging
 if (process.env.NODE_ENV === 'dev') {
   app.use(morgan('dev'))
 }
 
+// This will allow 100 requests from same IP in one hour, if the limit is crossed then the user will receive an error
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many requests from this IP, please try again in an hour!',
+})
+
+// Adding rate Limiter to the API route
+app.use('/api', limiter)
+
 // Using middleware(This will parse the req object)
-app.use(express.json())
+app.use(express.json({ limit: '10kb' }))
+
+// Serving static files
 app.use(express.static(`${__dirname}/public`))
 
 // Creating our own middleware function (next is passed as 3rd arg and its a convention to use name next)
@@ -26,6 +44,7 @@ app.use(express.static(`${__dirname}/public`))
   next()
 })*/
 
+// Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toDateString()
   next()
@@ -34,24 +53,6 @@ app.use((req, res, next) => {
 // Handler functions
 
 // Routes
-/*
-// @GET Tours
-app.get('/api/v1/tours', getAllTours)
-
-// @GET Individual Tour
-app.get('/api/v1/tours/:id', getTour)
-
-// @POST tours
-app.post('/api/v1/tours', createTour)
-
-// @PATCH update tours
-app.patch('/api/v1/tours/:id', updateTour)
-
-// @DELETE delete tours
-app.delete('/api/v1/tours/:id', deleteTour)
-  */
-
-// Refactoring routes
 
 // Connecting the router with our application
 // Mounting routers on route

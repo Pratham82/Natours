@@ -1,8 +1,13 @@
 const express = require('express')
 const fs = require('fs')
+
 const morgan = require('morgan')
 const rateLimit = require('express-rate-limit')
 const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+const hpp = require('hpp')
+
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
 const AppError = require('./utils/appError')
@@ -34,6 +39,26 @@ app.use('/api', limiter)
 
 // Using middleware(This will parse the req object)
 app.use(express.json({ limit: '10kb' }))
+
+// Date sanitization against NOSQL query injection (this will remove all the nosql queries from the req string )
+app.use(mongoSanitize())
+
+// Date sanitization against XSS attacks
+app.use(xss())
+
+// Preventing parameter pollution
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsAverage',
+      'ratingsQauntity',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+)
 
 // Serving static files
 app.use(express.static(`${__dirname}/public`))

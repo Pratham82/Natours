@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const fs = require('fs')
 const Tour = require('../../models/tourModel')
+const User = require('../../models/userModel')
 require('dotenv').config()
 
 // Connect to mongodb
@@ -15,15 +16,17 @@ mongoose
   .then(res => console.log('Remote Mongo DB connected ✅'))
 
 // Read Data
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-)
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'))
+
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'))
+
 //Import Data into DB
 const importData = async () => {
   try {
     // Crating multiple documents by passing array of documents
     await Tour.create(tours)
-    console.log('Data Successfully loaded')
+    //    awat User.create(users)
+    await console.log('Data Successfully loaded')
     process.exit()
   } catch (err) {
     console.log(err)

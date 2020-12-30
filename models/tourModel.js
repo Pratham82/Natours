@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const slugify = require('slugify')
-const validator = require('validator')
+//const validator = require('validator')
 require('dotenv').config()
 
 // Creating a schema for our database
@@ -82,6 +82,36 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      //Type: GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   { toJSON: { virtuals: true } },
   { toObject: { virtuals: true } }
@@ -104,6 +134,13 @@ tourSchema.pre('save', function (next) {
   next()
 })
 
+// Example of embedding
+//tourSchema.pre('save', async function (next) {
+//  const guidesPromises = this.guides.map(async id => await User.findById(id))
+//  this.guides = await Promise.all(guidesPromises)
+//  next()
+//})
+
 // Pre save hook
 //tourSchema.pre('save', function (next) {
 //  console.log('Saving the new document...')
@@ -123,6 +160,15 @@ tourSchema.pre('save', function (next) {
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } })
   this.start = Date.now()
+  next()
+})
+
+// Populate the users with given user IDs
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  })
   next()
 })
 

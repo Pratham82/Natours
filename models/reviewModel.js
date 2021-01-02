@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Tour = require('./tourModel')
 const User = require('./userModel')
+require('dotenv').config()
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -35,6 +36,6 @@ const reviewSchema = new mongoose.Schema(
   }
 )
 
-const Review = mongoose.Model('Review', reviewSchema)
+const Review = mongoose.model('Review', reviewSchema)
 
 module.exports = Review

@@ -35,7 +35,7 @@ exports.getTour = catchAsync(async (req, res, next) => {
   // We can use multiple parameters
   // To make a parameter optional we will have to add '?' after it:
   // app.get('/api/v0/tours/:id/:x/:y?', (req, res) => {
-  const tour = await Tour.findById(req.params.id)
+  const tour = await Tour.findById(req.params.id).populate('reviews')
 
   if (!tour) {
     return next(new AppError('No tour found with this ID', 404))

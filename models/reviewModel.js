@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const Tour = require('./tourModel')
-const User = require('./userModel')
 require('dotenv').config()
 
 const reviewSchema = new mongoose.Schema(
@@ -35,6 +33,16 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 )
+
+// Populating users and tours before sending them to users
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'name',
+  })
+
+  next()
+})
 
 const Review = mongoose.model('Review', reviewSchema)
 

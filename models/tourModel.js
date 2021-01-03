@@ -172,6 +172,13 @@ tourSchema.pre(/^find/, function (next) {
   next()
 })
 
+// Virtual populating
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+})
+
 // Post middleware
 tourSchema.post(/^find/, function (docs, next) {
   //console.log(docs)

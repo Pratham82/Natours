@@ -12,6 +12,7 @@ const {
   getTourStats,
   getMonthlyPlan,
 } = tourController
+const { createReview } = require('./../controllers/reviewController')
 
 tourRouter.route('/top-5-cheap').get(aliasTopTours, getAllTours)
 tourRouter.route('/tour-stats').get(getTourStats)
@@ -24,5 +25,10 @@ tourRouter
   .get(getTour)
   .patch(updateTour)
   .delete(protect, restrictTo('admin', 'lead-guide'), deleteTour)
+
+// Nested Routes for reviews
+tourRouter
+  .route('/:tourId/reviews')
+  .post(protect, restrictTo('user'), createReview)
 
 module.exports = tourRouter

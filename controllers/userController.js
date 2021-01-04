@@ -66,12 +66,7 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   })
 })
 
-exports.createUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    msg: 'Yet to be implemented',
-  })
-}
+exports.createUser = factory.createOne(User)
 
 exports.getUser = (req, res) => {
   res.status(500).send({
@@ -80,11 +75,6 @@ exports.getUser = (req, res) => {
   })
 }
 
-exports.updateUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    msg: 'Yet to be implemented',
-  })
-}
+exports.updateUser = factory.updateOne(User)
 
 exports.deleteUser = factory.deleteOne(User)

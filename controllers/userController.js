@@ -2,6 +2,7 @@ const fs = require('fs')
 const catchAsync = require('../utils/catchAsync')
 const AppError = require('./../utils/appError')
 const User = require('./../models/userModel')
+const factory = require('./handlerFacotry')
 
 //const users = JSON.parse(
 //  fs.readFileSync(`${__dirname}/../dev-data/data/users.json`)
@@ -86,9 +87,4 @@ exports.updateUser = (req, res) => {
   })
 }
 
-exports.deleteUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    msg: 'Yet to be implemented',
-  })
-}
+exports.deleteUser = factory.deleteOne(User)

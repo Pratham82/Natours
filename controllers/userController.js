@@ -9,17 +9,6 @@ const factory = require('./handlerFacotry')
 //)
 
 // User Route Handlers
-exports.getAllUsers = catchAsync(async (_, res) => {
-  const users = await User.find()
-
-  res.status(200).send({
-    status: 'success',
-    results: users.length,
-    data: {
-      users,
-    },
-  })
-})
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {}
@@ -66,14 +55,17 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   })
 })
 
-exports.createUser = factory.createOne(User)
-
-exports.getUser = (req, res) => {
-  res.status(500).send({
-    status: 'fail',
-    msg: 'Yet to be implemented',
+exports.createUser = (req, res) => {
+  res.status(500).json({
+    status: 'Failed',
+    message:
+      'This route is not implemented, Please use /signup route to create account',
   })
 }
+
+exports.getAllUsers = factory.getAll(User)
+
+exports.getUser = factory.getOne(User)
 
 exports.updateUser = factory.updateOne(User)
 

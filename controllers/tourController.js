@@ -12,41 +12,9 @@ exports.aliasTopTours = (req, res, next) => {
   next()
 }
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  // Execute query
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate()
-  const allTours = await features.query
+exports.getAllTours = factory.getAll(Tour)
 
-  res.status(200).send({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: allTours.length,
-    data: {
-      allTours,
-    },
-  })
-})
-
-exports.getTour = catchAsync(async (req, res, next) => {
-  // In req.params all the parameters are stored
-  // We can use multiple parameters
-  // To make a parameter optional we will have to add '?' after it:
-  // app.get('/api/v0/tours/:id/:x/:y?', (req, res) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews')
-
-  if (!tour) {
-    return next(new AppError('No tour found with this ID', 404))
-  }
-
-  res.status(200).send({
-    status: 'success',
-    tours: tour,
-  })
-})
+exports.getTour = factory.getOne(Tour, { path: 'reviews' })
 
 exports.createTour = factory.createOne(Tour)
 

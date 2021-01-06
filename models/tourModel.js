@@ -166,7 +166,7 @@ tourSchema.pre(/^find/, function (next) {
 // Populate the users with given user IDs
 tourSchema.pre(/^find/, function (next) {
   this.populate({
-    path: 'guides',
+    path: 'guides reviews',
     select: '-__v -passwordChangedAt',
   })
   next()
